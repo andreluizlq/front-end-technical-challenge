@@ -18,7 +18,7 @@ export default function MapStore() {
   return (
     <Box className="Map" sx={{ height: "30rem", width: "100%" }}>
       <GoogleMapReact
-        bootstrapURLKeys={{ key: "AIzaSyC6munUy9XhZ5Z5frB4YmnrNvatlZJBytw" }}
+        bootstrapURLKeys={{ key: `${process.env.REACT_APP_MAP_KEY}` }}
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
       >
