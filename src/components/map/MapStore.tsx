@@ -1,15 +1,18 @@
-import React from "react";
 import GoogleMapReact from "google-map-react";
-import MapPoint from "./MapPoint";
+import { v4 as uuidV4 } from "uuid";
 import { Box } from "@mui/material";
+import MapPoint from "./MapPoint";
+import useStores from "../../hooks/useStore";
 
 export default function MapStore() {
+  const { stores } = useStores();
+
   const defaultProps = {
     center: {
-      lat: 10.99835602,
-      lng: 77.01502627,
+      lat: -23.568767,
+      lng: -46.649907,
     },
-    zoom: 11,
+    zoom: 12,
   };
 
   return (
@@ -19,7 +22,17 @@ export default function MapStore() {
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
       >
-        <MapPoint lat={59.955413} lng={30.337844} text="My Marker" />
+        {stores.map((store) => (
+          <MapPoint
+            key={uuidV4()}
+            lat={store.latitude}
+            lng={store.longitude}
+            revenue={store.revenue}
+            name={store.name}
+            city={store.city}
+            state={store.state}
+          />
+        ))}
       </GoogleMapReact>
     </Box>
   );

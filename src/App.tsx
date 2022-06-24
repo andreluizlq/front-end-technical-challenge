@@ -1,32 +1,76 @@
-import React, { useEffect, useState } from "react";
-import { Container, Box, Grid } from "@mui/material";
-import SearchStores from "./components/SearchStores";
-import { storeApi } from "./utils/api";
-import { IStore } from "./interfaces/store";
+import VMasker from "vanilla-masker";
+import {
+  Container,
+  TextField,
+  Grid,
+  InputAdornment,
+  Autocomplete,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import LabelFields from "./components/LabelFields";
+import useStores from "./hooks/useStore";
+import Page from "./components/Page";
 import MapStore from "./components/map/MapStore";
+import TableStores from "./components/TableStores";
 
 function App() {
-  const [stores, setStores] = useState<IStore[]>([]);
-
-  useEffect(() => {
-    const getStore = async () => {
-      const { data } = await storeApi.get("");
-      setStores(data.stores);
-    };
-    getStore();
-  }, []);
+  const { filterStoresByName, stores, billing, handleChangeBilling } =
+    useStores();
 
   return (
-    <Container>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <MapStore />
+    <Page>
+      <Container>
+        <Grid container spacing={3} sx={{ mb: "2rem" }}>
+          <Grid item xs={12} md={8}>
+            <LabelFields title="Buscar" />
+            <Autocomplete
+              fullWidth
+              options={stores.map((store) => store.name)}
+              size="small"
+              getOptionLabel={(option) => option}
+              noOptionsText="Loja não encontrada"
+              onChange={(_, value) =>
+                value ? filterStoresByName(value) : filterStoresByName("")
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Pesquise por uma loja"
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <LabelFields title="Faturamento mínimo esperado" />
+            <TextField
+              fullWidth
+              size="small"
+              value={`R$ ${billing ?? "0.0"}`}
+              placeholder="Ex. 15.000,00"
+              onChange={(event) => {
+                handleChangeBilling(VMasker.toMoney(event.target.value));
+              }}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <SearchStores stores={stores} />
+        <Grid container spacing={3} sx={{ mb: "2rem" }}>
+          <Grid item xs={12} lg={8}>
+            <MapStore />
+          </Grid>
+          <Grid item xs={12} lg={4}>
+            <TableStores />
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </Page>
   );
 }
 
